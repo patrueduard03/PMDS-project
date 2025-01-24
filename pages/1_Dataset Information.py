@@ -3,7 +3,6 @@ import pandas as pd
 
 
 st.title("Poker Dataset Information")
-st.write("### Welcome to the Poker Dataset Explorer!")
 st.write("This page provides a detailed overview of the dataset structure, attributes, and statistics.")
 
 # Dataset Description
