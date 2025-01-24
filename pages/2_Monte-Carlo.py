@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 import random
 from collections import Counter
 
+# Class names
+class_names = [
+    "Nothing in hand", "One Pair", "Two Pairs", "Three of a Kind", "Straight",
+    "Flush", "Full House", "Four of a Kind", "Straight Flush", "Royal Flush"
+]
+
 # File paths
 data_folder = "PokerData"
 training_file = os.path.join(data_folder, "poker-hand-training-true.data")
