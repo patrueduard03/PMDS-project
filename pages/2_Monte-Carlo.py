@@ -28,18 +28,21 @@ def analyze_distribution(training_data):
     """Analyze and visualize hand class distribution in the dataset."""
     hand_class_distribution = training_data['Hand_Class'].value_counts(normalize=True).sort_index()
     hand_class_percentages = hand_class_distribution * 100
+
+    # Create a DataFrame with hand class names
     distribution_table = pd.DataFrame({
-        'Hand_Class': hand_class_distribution.index,
+        'Hand Class': class_names,
         'Frequency': hand_class_distribution.values,
         'Percentage (%)': hand_class_percentages.values
     })
 
+    # Display the distribution table
     st.write("### Poker Hand Class Distribution")
-    st.dataframe(distribution_table)
+    st.dataframe(distribution_table.set_index('Hand Class'))
 
     # Plot distribution
-    fig, ax = plt.subplots(figsize=(10, 6))
-    bars = ax.bar(distribution_table['Hand_Class'], distribution_table['Percentage (%)'])
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars = ax.bar(distribution_table['Hand Class'], distribution_table['Percentage (%)'])
 
     # Add labels to bars
     for bar in bars:
@@ -50,6 +53,7 @@ def analyze_distribution(training_data):
     ax.set_xlabel('Poker Hand Class')
     ax.set_ylabel('Percentage (%)')
     ax.set_title('Poker Hand Class Distribution')
+    plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
     st.pyplot(fig)
 
     return distribution_table
