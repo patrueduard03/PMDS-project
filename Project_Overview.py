@@ -1,11 +1,8 @@
 import streamlit as st
 
 # Page Title
-st.title("Project Overview: Poker Hand Analysis")
-st.markdown("""
-This page provides an overview of the project goals, methodology, and outcomes.
-We explore Poker hand probabilities using empirical data and Monte Carlo simulations.
-""")
+st.title("PMDS Project - Poker Hand Analysis")
+st.write("Patru Gheorghe-Eduard, FMI-BIG DATA")
 
 # What Do We Study?
 st.markdown("## 1. What Do We Study?")

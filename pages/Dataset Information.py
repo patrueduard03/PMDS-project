@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-# Page Title
-st.title("PMDS Project")
-st.write("Patru Gheorghe-Eduard, FMI-BIG DATA")
 
 st.title("Poker Dataset Information")
 st.write("### Welcome to the Poker Dataset Explorer!")
