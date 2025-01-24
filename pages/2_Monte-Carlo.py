@@ -4,12 +4,8 @@ import os
 import matplotlib.pyplot as plt
 import random
 from collections import Counter
+import plotly.graph_objects as go
 
-# Class names
-class_names = [
-    "Nothing in hand", "One Pair", "Two Pairs", "Three of a Kind", "Straight",
-    "Flush", "Full House", "Four of a Kind", "Straight Flush", "Royal Flush"
-]
 
 # File paths
 data_folder = "PokerData"
@@ -17,6 +13,12 @@ training_file = os.path.join(data_folder, "poker-hand-training-true.data")
 
 # Column names
 column_names = ['S1', 'R1', 'S2', 'R2', 'S3', 'R3', 'S4', 'R4', 'S5', 'R5', 'Hand_Class']
+
+# Class names
+class_names = [
+    "Nothing in hand", "One Pair", "Two Pairs", "Three of a Kind", "Straight",
+    "Flush", "Full House", "Four of a Kind", "Straight Flush", "Royal Flush"
+]
 
 # Load dataset
 def load_poker_dataset():
@@ -31,24 +33,21 @@ def load_poker_dataset():
 
 # Analyze hand class distribution
 def analyze_distribution(training_data):
-    """Analyze and visualize hand class distribution in the dataset."""
     hand_class_distribution = training_data['Hand_Class'].value_counts(normalize=True).sort_index()
     hand_class_percentages = hand_class_distribution * 100
-
-    # Create a DataFrame with hand class names
     distribution_table = pd.DataFrame({
-        'Hand Class': class_names,
+        'Hand Class ID': hand_class_distribution.index,
+        'Hand Name': [class_names[i] for i in hand_class_distribution.index],
         'Frequency': hand_class_distribution.values,
         'Percentage (%)': hand_class_percentages.values
     })
 
-    # Display the distribution table
     st.write("### Poker Hand Class Distribution")
-    st.dataframe(distribution_table.set_index('Hand Class'))
+    st.dataframe(distribution_table.set_index('Hand Name'))
 
     # Plot distribution
-    fig, ax = plt.subplots(figsize=(12, 6))
-    bars = ax.bar(distribution_table['Hand Class'], distribution_table['Percentage (%)'])
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = ax.bar(distribution_table['Hand Name'], distribution_table['Percentage (%)'])
 
     # Add labels to bars
     for bar in bars:
@@ -149,35 +148,48 @@ def monte_carlo_simulation(num_simulations=100000):
 
 # Comparison between empirical and simulated probabilities
 def compare_probabilities(empirical, simulated):
-    """Compare empirical and simulated probabilities."""
-    comparison_table = pd.DataFrame({
-        "Empirical (%)": empirical["Percentage (%)"],
-        "Simulated (%)": [simulated.get(hand, 0) for hand in empirical["Hand_Class"]]
-    }, index=empirical["Hand_Class"])
-    st.write("### Comparison of Empirical and Simulated Probabilities")
-    st.dataframe(comparison_table)
+    # Prepare data for the plot
+    categories = empirical['Hand Name']
+    empirical_values = empirical['Percentage (%)']
+    simulated_values = [simulated.get(hand_id, 0) for hand_id in empirical['Hand Class ID']]
 
-    # Plot comparison
-    fig, ax = plt.subplots(figsize=(10, 6))
-    x = comparison_table.index
-    bar_width = 0.4
+    # Create Plotly figure for a grouped horizontal bar chart
+    fig = go.Figure()
 
-    empirical_bars = ax.bar(x - bar_width / 2, comparison_table["Empirical (%)"], width=bar_width, label="Empirical")
-    simulated_bars = ax.bar(x + bar_width / 2, comparison_table["Simulated (%)"], width=bar_width, label="Simulated")
+    # Add empirical data trace
+    fig.add_trace(go.Bar(
+        name='Empirical',
+        y=categories,
+        x=empirical_values,
+        orientation='h',
+        hoverinfo='x',
+        marker_color='rgb(55, 83, 109)'
+    ))
 
-    for bar in empirical_bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, height, f'{height:.2f}%', ha='center', va='bottom')
+    # Add simulated data trace
+    fig.add_trace(go.Bar(
+        name='Simulated',
+        y=categories,
+        x=simulated_values,
+        orientation='h',
+        hoverinfo='x',
+        marker_color='rgb(26, 118, 255)'
+    ))
 
-    for bar in simulated_bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, height, f'{height:.2f}%', ha='center', va='bottom')
+    # Update layout for better readability
+    fig.update_layout(
+        barmode='group',
+        title='Comparison of Empirical and Simulated Probabilities',
+        xaxis_tickangle=-45,
+        xaxis_title='Percentage (%)',
+        yaxis_title='Poker Hand Class',
+        legend_title='Source',
+        hovermode='y unified'
+    )
 
-    ax.set_xlabel("Poker Hand Class")
-    ax.set_ylabel("Percentage (%)")
-    ax.set_title("Empirical vs. Simulated Probabilities")
-    ax.legend()
-    st.pyplot(fig)
+    # Display the chart in Streamlit
+    st.plotly_chart(fig)
+
 
 # Main execution
 st.title("Monte Carlo Analysis of Poker Hands")
